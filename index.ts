@@ -62,4 +62,12 @@ function excluirContato(nomeParaExcluir: string): void {
     console.log(`Contato com número ${nomeParaExcluir} não encontrado.`);
   }
 }
-
+ function editarContato (nomeParaEditar: string): void{
+  let index = buscaContato(nomeParaEditar);
+  listaDeContatos[index].numero = parseFloat(prompt("Insira um número") || "Sem número");
+  listaDeContatos[index].nome = prompt("Edite o nome") || "Sem nome";
+  listaDeContatos[index].sobrenome = prompt("Edite o sobrenome") || "";
+  listaDeContatos[index].empresa = prompt("Edite o nome") || "";
+  listaDeContatos[index].email = prompt("Edite o nome") || "";
+  alert(`Contato editado: \n \n Nome: ${listaDeContatos[index].nome} \n Número: ${listaDeContatos[index].numero} \n Sobrenome: ${listaDeContatos[index].sobrenome} \n Empresa: ${listaDeContatos[index].empresa} \n Email: ${listaDeContatos[index].email}`)
+ }
