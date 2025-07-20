@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda de Contatos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h2>Meus Contatos</h2>
+
+    <div id="funcoes-auxiliares">
+        
+        <button id="btn-pesquisar">Pesquise</button>
+        <input id="termo-procurado" placeholder="Busque" type="text">
+
+        <button id="btn-excluir">Excluir</button>
+        <input id="nome-excluido" placeholder="Digite o nome" type="text">
+
+        <button id="btn-editar">Editar</button>
+        <input id="nome-para-editar" placeholder="Digite o nome" type="text">
+
+    </div>
+    <br>
+    <div id="sessao-adicionar-contato">
+        
+        <button id="btn-adicionar">Adicionar Contato</button>
+
+        <input id="contato-nome" placeholder="Nome do Contato" type="text">
+        <input id="contato-sobrenome" placeholder="Sobrenome do Contato" type="text">
+        <input id="contato-numero" placeholder="Telefone" type="text">
+        <input id="contato-empresa" placeholder="Nome da Empresa" type="text">
+        <input id="contato-email" placeholder="Email" type="email">
+
+    </div>
+
+    <ul id="lista-de-contatos"></ul>
+
+    <script src="dist/index.js"></script>
+</body>
+
+</html>
