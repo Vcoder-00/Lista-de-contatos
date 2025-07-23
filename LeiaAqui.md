@@ -10,11 +10,10 @@ Projeto em Node.js + TypeScript para gerenciamento de contatos.
 ## 🚀 Instalação e uso
 
 ```bash
-# 1. Clonar o repositório
-git clone https://github.com/Vcoder-00/Lista-de-contatos
 
-#  2. Instalar as dependências
+#  1. Instalar as dependências
 npm install
 
-# 3. Rodar o projeto
-npm run dev  # ou npm start, dependendo do seu setup
+#  2. Rodar o projeto Compile o typeScript para JavaScript
+npx tsc
+

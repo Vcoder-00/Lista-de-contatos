@@ -30,37 +30,63 @@ const inputEmail = document.getElementById('contato-email') as HTMLInputElement;
 const inputTermoProcurado = document.getElementById('termo-procurado') as HTMLInputElement;
 const inputNomeExcluido = document.getElementById('nome-excluido') as HTMLInputElement;
 const inputParaEditar = document.getElementById('nome-para-editar') as HTMLInputElement;
+const inputAlteracaoNome = document.getElementById('alteracoes-nome') as HTMLInputElement;
+const inputAlteracaoSobrenome = document.getElementById('alteracoes-sobrenome') as HTMLInputElement
+const inputAlteracaoNumero = document.getElementById('alteracoes-numero') as HTMLInputElement
+const inputAlteracaoEmpresa = document.getElementById('alteracoes-empresa') as HTMLInputElement
+const inputAlteracaoEmail = document.getElementById('alteracoes-email') as HTMLInputElement
+
+const listaHtml = document.getElementById('lista-de-contatos') as HTMLUListElement; // Onde os contatos serão exibidos
 
 const btnAdicionar = document.getElementById('btn-adicionar') as HTMLButtonElement;
 const btnPesquisar = document.getElementById('btn-pesquisar') as HTMLButtonElement;
 const btnExcluir = document.getElementById('btn-excluir') as HTMLButtonElement;
-const btnEditar = document.getElementById('btn-editar') as HTMLButtonElement;
-const listaHtml = document.getElementById('lista-de-contatos') as HTMLUListElement; // Onde os contatos serão exibidos
+const btnSalvarAlteracoes = document.getElementById('btn-salvar-alteracoes') as HTMLButtonElement;
+const btnCancelarAlteracoes = document.getElementById('btn-cancelar-alteracoes') as HTMLButtonElement;
+
 btnAdicionar.addEventListener('click', adicionaContatos);
 btnPesquisar.addEventListener('click', lidarComPesquisa);
-btnExcluir
-btnEditar
+btnExcluir.addEventListener('click', excluirContato);
+btnSalvarAlteracoes.addEventListener('click', editarContato);
+btnCancelarAlteracoes.addEventListener('click', fecharFormulario)
 
+let formularioDeEdicao = document.getElementById('formulario-de-edicao') as HTMLDivElement;
 //-------------------------------------------------------------------------------------------------------
 
+// Variavel global
+// Inicia como null, essa variavel captura um elemento que foi clicado e aberto. Os botões cancelar e salvar contato não possuem um id próprio, então eles vão receber o contato que essa variavel pegar
+let contatoSendoEditado: Contato | null = null; 
 
-function exibeContatos(): void {
+//-------------------------------------------------------------------------------------------------------
+function exibeContatos(lista?: Array<Contato>): void {
 
   listaHtml.textContent = '' // -->  para limpar a lista visualmente antes de renderizar os itens novamente.
 
   // pq limpar? precisamos garantir que não estamos duplicando a exibição.
 
-  if (listaDeContatos.length === 0) {
-    console.log("Nenhum contato cadastrado.");
+  if (lista?.length === 0 || listaDeContatos.length === 0) {
+    console.log("Nenhum contato encontrado.");
   }
 
-  listaDeContatos.forEach(contato => { // forEach acessa cada elemento e executa uma função com ele
+  if (lista !== undefined) {
+    // forEach acessa cada elemento e executa uma função com ele
     // inserindo no elemento a ser exibido na lista
-    const liDeContatos = document.createElement('li'); // elemento novo para o html
-    liDeContatos.textContent = `Nome: ${contato.nome}, Sobrenome: ${contato.sobrenome || "N/A"}, Número: ${contato.numero},Empresa: ${contato.empresa || "N/A"}, Email: ${contato.email || "N/A"}`;
-
-    listaHtml.appendChild(liDeContatos); // --> arvore do DOM se anexa a esse novo elemento
-  });
+    lista.forEach(contato => { 
+      const liDeContatos = document.createElement('li'); // elemento novo para o html
+      liDeContatos.id = `contato-item-${contato.nome.replace(/\s/g, '-')}-${contato.numero}`; // esse id eu implementei depois, ele torna cada contato identificavel para ser usado em parametros de funções
+      liDeContatos.addEventListener('click', lidarCliqueContato);
+      liDeContatos.textContent = `Nome: ${contato.nome}, Sobrenome: ${contato.sobrenome || "N/A"}, Número: ${contato.numero},Empresa: ${contato.empresa || "N/A"}, Email: ${contato.email || "N/A"}`;
+      listaHtml.appendChild(liDeContatos); // --> arvore do DOM se anexa a esse novo elemento
+    });
+  } else {
+    listaDeContatos.forEach(contato => { 
+      const liDeContatos = document.createElement('li'); // elemento novo para o html, 'li' é uma tag que o html já entende como o elemento de uma lista
+      liDeContatos.id = `contato-item-${contato.nome.replace(/\s/g, '-')}-${contato.numero}`; // formatando o id do contato (*)
+      liDeContatos.addEventListener('click', lidarCliqueContato);
+      liDeContatos.textContent = `Nome: ${contato.nome}, Sobrenome: ${contato.sobrenome || "N/A"}, Número: ${contato.numero},Empresa: ${contato.empresa || "N/A"}, Email: ${contato.email || "N/A"}`;
+      listaHtml.appendChild(liDeContatos); // --> arvore do DOM se anexa a esse novo elemento
+    });
+  }
 
 }
 
@@ -76,7 +102,7 @@ function adicionaContatos(): void {
 
   exibeContatos();
 
-  // Limpa os campos de input do HTML para a próxima entrada
+  // Limpa os campos de digitação do HTML para a próxima entrada
 
   inputTelefone.value = "";
   inputNome.value = "";
@@ -86,69 +112,80 @@ function adicionaContatos(): void {
 
 }
 
-// função auxiliar (ela vai ajudar as próximas funções)
 
-function buscaContato(termoDePesquisa: string): number {
-  // Normatiza o termo de pesquisa para minúsculas apenas uma vez.
-  const termoNormatizado = termoDePesquisa.toLowerCase();
-
-  // Percorre cada contato na listaDeContatos.
-  for (let i = 0; i < listaDeContatos.length; i++) {
-    let contato = listaDeContatos[i]; // Atribui o contato atual a uma constante para facilitar o acesso.
-
-    // Cria um array com os valores string (em minúsculas) de todas as propriedades que você quer buscar.
-    // O operador ?? garante que, se a propriedade for 'undefined', uma string vazia '' será usada.
-    let valoresParaBuscar = [
-      contato.nome.toLowerCase(),
-      (contato.sobrenome ?? '').toLowerCase(), // Trata 'sobrenome' opcional
-      contato.numero.toLowerCase(),           // Assume que 'numero' é string. Se for number, converta: String(contato.numero).toLowerCase()
-      (contato.empresa ?? '').toLowerCase(),  // Trata 'empresa' opcional
-      (contato.email ?? '').toLowerCase()     // Trata 'email' opcional
-    ];
-
-    // Usa 'some()' para verificar se Pelo Menos Um dos valores no array inclui o termo de pesquisa.
-    // 'some()' retorna 'true' assim que encontra uma correspondência e para a iteração.
-    let encontrado = valoresParaBuscar.some(valor => valor.includes(termoNormatizado));
-
-    if (encontrado == true) {
-      return i; // Se o termo for encontrado em QUALQUER propriedade do contato, retorna o índice.
-    }
+function excluirContato(): void {
+  let IndexContato = listaDeContatos.findIndex((contato) => contato == contatoSendoEditado);
+  listaDeContatos.splice(IndexContato, 1);
+  
+  fecharFormulario();
+  exibeContatos();
   }
-  return -1; // Se o loop terminar e nenhum contato for encontrado, retorna -1.
+
+function editarContato(): void {
+  let index = listaDeContatos.findIndex((contato) => contato == contatoSendoEditado);
+  
+  listaDeContatos[index].numero = inputAlteracaoNumero.value;
+  listaDeContatos[index].nome = inputAlteracaoNome.value;
+  listaDeContatos[index].sobrenome = inputAlteracaoSobrenome.value ?? 'N/A';
+  listaDeContatos[index].empresa = inputAlteracaoEmpresa.value ?? 'N/A';
+  listaDeContatos[index].email = inputAlteracaoEmail.value ?? 'N/A';
+  alert(`Contato editado: \n \n Nome: ${listaDeContatos[index].nome} \n Número: ${listaDeContatos[index].numero} \n Sobrenome: ${listaDeContatos[index].sobrenome} \n Empresa: ${listaDeContatos[index].empresa} \n Email: ${listaDeContatos[index].email}`);
+  fecharFormulario();
+  exibeContatos();
 }
 
-
-// function excluirContato(termoParaExcluir: string): void {
-//   let index = buscaContato(termoParaExcluir);
-
-//   if (index !== -1) {
-//     listaDeContatos.splice(index, 1);
-//     console.log(`Contato com número ${nomeParaExcluir} excluído.`);
-//   } else {
-//     console.log(`Contato com número ${nomeParaExcluir} não encontrado.`);
-//   }
-// }
-
-function editarContato(nomeParaEditar: string): void {
-  let index = buscaContato(nomeParaEditar);
-  listaDeContatos[index].numero = prompt("Insira um número")!;
-  listaDeContatos[index].nome = prompt("Edite o nome")!;
-  listaDeContatos[index].sobrenome = prompt("Edite o sobrenome") || "N/A";
-  listaDeContatos[index].empresa = prompt("Edite o nome") || "N/A";
-  listaDeContatos[index].email = prompt("Edite o nome") || "N/A";
-  alert(`Contato editado: \n \n Nome: ${listaDeContatos[index].nome} \n Número: ${listaDeContatos[index].numero} \n Sobrenome: ${listaDeContatos[index].sobrenome} \n Empresa: ${listaDeContatos[index].empresa} \n Email: ${listaDeContatos[index].email}`)
+function verificaBusca(contatoAtual: Contato, termoDePesquisa: string): boolean {
+  let verificacaoPorContato: Array<string> = [
+    contatoAtual.nome.toLowerCase(),
+    (contatoAtual.sobrenome ?? '').toLowerCase(),
+    contatoAtual.numero.toLowerCase(),
+    (contatoAtual.empresa ?? '').toLowerCase(),
+    (contatoAtual.email ?? '').toLowerCase()
+  ];
+  return verificacaoPorContato.some((valor) => valor.includes(termoDePesquisa));
 }
 
-function verificaBusca (termoDePesquisa: string): boolean {
-  for (let contatos in listaDeContatos){
-    if (buscaContato(termoDePesquisa) >= 0)
-      return true;
-  }
-  return false;
-}
 function lidarComPesquisa(): void {
-  const termoDePesquisa = inputTermoProcurado.value.toLowerCase();
-  listaDeContatos.filter(verificaBusca());
-
+  let termoDePesquisa = inputTermoProcurado.value.toLowerCase();
+  if (termoDePesquisa === '') {
+    return exibeContatos();
+  }
+  let contatosFiltrados = listaDeContatos.filter(contato => verificaBusca(contato, termoDePesquisa));
+  exibeContatos(contatosFiltrados);
 }
+
+function lidarCliqueContato(event: Event):void {
+  console.log("função abrir chamada")
+    let elementoClicado = event.currentTarget as HTMLLIElement; // evento disparado no caso clicar o li (elemento da lista de contatos)
+    let idDoContatoClicado = elementoClicado.id; 
+    let partesDoContato: Array<string> = idDoContatoClicado.split('-'); // formatei o id de cada contato assim: ex contato-item-Maria-Silva-987654321. E agora estou retirando os '-' para pegar o nome e numero separados
+    let numeroExtraido = partesDoContato[partesDoContato.length - 1]; //captura do ultimo elemento (numero)
+    let nomeExtraido:string = partesDoContato.slice(2, partesDoContato.length -1).join(' '); //captura do 3º elemento até o penultimo (excluindo 'contato' e 'item') e formatação com o join(). Fazendo por exemplo o id Maria-Silva se tornar Maria Silva
+    console.log(numeroExtraido);
+    console.log(nomeExtraido);
+    //Pesquisa do contato com base no nome + numero
+    let contatoEncontrado = listaDeContatos.find((contato) => contato.nome == nomeExtraido && contato.numero == numeroExtraido)
+
+    if (contatoEncontrado) { // Se contatoEncontrado existir ele é true. Coisas o if em TypeScript e JavaScript
+      abrirFormulario(contatoEncontrado!);
+    }
+    else console.log("Erro: Contato não encontrado para o ID:", idDoContatoClicado);
+}
+
+function abrirFormulario (contato: Contato) {
+    formularioDeEdicao.style.display = 'block'; // ativa o formulario (torna ele visivel)
+
+  // inserindo o dado do contato selecionado nos campos de alteração
+  inputAlteracaoNome.value = contato.nome;
+  inputAlteracaoSobrenome.value = contato.sobrenome ?? 'N/A';
+  inputAlteracaoNumero.value = contato.numero;
+  inputAlteracaoEmpresa.value = contato.empresa ?? 'N/A';
+  inputAlteracaoEmail.value = contato.email ?? 'N/A';
+
+  // definindo minha variavel global para depois repassa-la para os botões de 'Salvar Alterações' e 'Excluir'
+  contatoSendoEditado = contato;
+}
+
+function fecharFormulario (): void {
+  formularioDeEdicao.style.display = 'none';
 }

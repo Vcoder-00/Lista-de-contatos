@@ -17,16 +17,9 @@
         <button id="btn-pesquisar">Pesquise</button>
         <input id="termo-procurado" placeholder="Busque" type="text">
 
-        <button id="btn-excluir">Excluir</button>
-        <input id="nome-excluido" placeholder="Digite o nome" type="text">
-
-        <button id="btn-editar">Editar</button>
-        <input id="nome-para-editar" placeholder="Digite o nome" type="text">
-
     </div>
     <br>
     <div id="sessao-adicionar-contato">
-        
         <button id="btn-adicionar">Adicionar Contato</button>
 
         <input id="contato-nome" placeholder="Nome do Contato" type="text">
@@ -38,6 +31,22 @@
     </div>
 
     <ul id="lista-de-contatos"></ul>
+
+    <div id="formulario-de-edicao" style="display: none;">
+        <h2>Editar Contato</h2>
+
+        <input id="alteracoes-nome" placeholder="Nome do Contato" type="text">
+        <br>
+        <input id="alteracoes-sobrenome" placeholder="Sobrenome do Contato" type="text">
+        <br>
+        <input id="alteracoes-numero" placeholder="Telefone" type="text">
+        <br>
+        <input id="alteracoes-empresa" placeholder="Nome da Empresa" type="text">
+        <br>
+        <input id="alteracoes-email" placeholder="Email" type="email">
+        <br>
+        <button id="btn-cancelar-alteracoes">Cancelar</button> <button id="btn-salvar-alteracoes">Salvar alterações</button> <button id="btn-excluir">Excluir</button> 
+    </div>
 
     <script src="dist/index.js"></script>
 </body>
