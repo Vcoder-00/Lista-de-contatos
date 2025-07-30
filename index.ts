@@ -83,7 +83,7 @@ function exibeContatos(lista?: Array<Contato>): void { //exibe uma lista filtrad
       const liDeContatos = document.createElement('li'); // elemento novo para o html, 'li' é uma tag que o html já entende como o elemento de uma lista
       liDeContatos.id = `contato-item-${contato.nome.replace(/\s/g, '-')}-${contato.numero}`; // formatando o id do contato (*)
       liDeContatos.addEventListener('click', lidarCliqueContato);
-      liDeContatos.textContent = `Nome: ${contato.nome}, Sobrenome: ${contato.sobrenome || "N/A"}, Número: ${contato.numero},Empresa: ${contato.empresa || "N/A"}, Email: ${contato.email || "N/A"}`;
+      liDeContatos.textContent = `Nome: ${contato.nome},  Sobrenome: ${contato.sobrenome || "N/A"},  Número: ${contato.numero},  Empresa: ${contato.empresa || "N/A"},  Email: ${contato.email || "N/A"}`;
       listaHtml.appendChild(liDeContatos); // --> arvore do DOM se anexa a esse novo elemento
     });
   }
@@ -92,117 +92,118 @@ function exibeContatos(lista?: Array<Contato>): void { //exibe uma lista filtrad
 
 function adicionaContatos(): void {
 
-  let contatoNumero : string = inputTelefone.value;
-  let contatoNome : string = inputNome.value;
-  let contatoSobrenome : string | undefined = inputSobrenome.value || undefined; // --> lembrando esses atributos não são obrigatórios
+  let contatoNumero: string = inputTelefone.value;
+  let contatoNome: string = inputNome.value;
+  let contatoSobrenome: string | undefined = inputSobrenome.value || undefined; // --> lembrando esses atributos não são obrigatórios
   let contatoEmpresa: string | undefined = inputEmpresa.value || undefined;
   let contatoEmail: string | undefined = inputEmail.value || undefined;
 
-  if (listaDeContatos.some((contato) => contato.nome == contatoNome && contato.numero == contatoNumero)) {
-    alert('Já existe um contato com o mesmo nome e número');
+  if (isNaN(Number(contatoNumero))) { // verifica se o usuario digitou um nome. Se digitou, Number(contatoNumero) vai resultar em NaN o que torna esse if(true) e dispara o alert de erro pro usuario
+    alert("Número de telefone não é um número");
   }
   else {
-    if (isNaN(Number(contatoNumero))) { // verifica se o usuario digitou um nome
-      alert("Número de telefone não é um número");
-    }
+
+  if (listaDeContatos.some((contato) => contato.nome == contatoNome && contato.numero == contatoNumero)) {
+    alert('Já existe um contato com o mesmo nome e número');
+  }    
     else {
 
-        let contato = new Contato(contatoNumero, contatoNome, contatoSobrenome, contatoEmpresa, contatoEmail);
+      let contato = new Contato(contatoNumero, contatoNome, contatoSobrenome, contatoEmpresa, contatoEmail);
 
-        if (contatoNumero == '' || contatoNome == '') {
-          alert('Seu contato precisa ter nome e número!')
-        }
-        else {
-          listaDeContatos.push(contato);
+      if (contatoNumero == '' || contatoNome == '') {
+        alert('Seu contato precisa ter nome e número!');
+      }
+      else {
+        listaDeContatos.push(contato);
 
-          exibeContatos();
+        exibeContatos();
 
-          // Limpa os campos de digitação do HTML para a próxima entrada
+        // Limpa os campos de digitação do HTML para a próxima entrada
 
-          inputTelefone.value = "";
-          inputNome.value = "";
-          inputSobrenome.value = "";
-          inputEmpresa.value = "";
-          inputEmail.value = "";
+        inputTelefone.value = "";
+        inputNome.value = "";
+        inputSobrenome.value = "";
+        inputEmpresa.value = "";
+        inputEmail.value = "";
 
-        }
       }
     }
   }
+}
 
-  function excluirContato(): void {
-    let IndexContato = listaDeContatos.findIndex((contato) => contato == contatoSendoEditado);
-    listaDeContatos.splice(IndexContato, 1);
+function excluirContato(): void {
+  let IndexContato = listaDeContatos.findIndex((contato) => contato == contatoSendoEditado);
+  listaDeContatos.splice(IndexContato, 1);
 
-    fecharFormulario();
-    exibeContatos();
+  fecharFormulario();
+  exibeContatos();
+}
+
+function editarContato(): void {
+  let index = listaDeContatos.findIndex((contato) => contato == contatoSendoEditado);
+
+  listaDeContatos[index].numero = inputAlteracaoNumero.value;
+  listaDeContatos[index].nome = inputAlteracaoNome.value;
+  listaDeContatos[index].sobrenome = inputAlteracaoSobrenome.value ?? 'N/A';
+  listaDeContatos[index].empresa = inputAlteracaoEmpresa.value ?? 'N/A';
+  listaDeContatos[index].email = inputAlteracaoEmail.value ?? 'N/A';
+  alert(`Contato editado: \n \n Nome: ${listaDeContatos[index].nome} \n Número: ${listaDeContatos[index].numero} \n Sobrenome: ${listaDeContatos[index].sobrenome} \n Empresa: ${listaDeContatos[index].empresa} \n Email: ${listaDeContatos[index].email}`);
+  fecharFormulario();
+  exibeContatos();
+}
+
+function verificaBusca(contatoAtual: Contato, termoDePesquisa: string): boolean {
+  let verificacaoPorContato: Array<string> = [
+    contatoAtual.nome.toLowerCase(),
+    (contatoAtual.sobrenome ?? '').toLowerCase(),
+    contatoAtual.numero.toLowerCase(),
+    (contatoAtual.empresa ?? '').toLowerCase(),
+    (contatoAtual.email ?? '').toLowerCase()
+  ];
+  return verificacaoPorContato.some((valor) => valor.includes(termoDePesquisa));
+}
+
+function lidarComPesquisa(): void {
+  let termoDePesquisa = inputTermoProcurado.value.toLowerCase();
+  if (termoDePesquisa === '') {
+    return exibeContatos();
   }
+  let contatosFiltrados = listaDeContatos.filter(contato => verificaBusca(contato, termoDePesquisa));
+  exibeContatos(contatosFiltrados);
+}
 
-  function editarContato(): void {
-    let index = listaDeContatos.findIndex((contato) => contato == contatoSendoEditado);
+function lidarCliqueContato(event: Event): void {
+  console.log("função abrir chamada");
+  let elementoClicado = event.currentTarget as HTMLLIElement; // evento disparado no caso clicar o li (elemento da lista de contatos)
+  let idDoContatoClicado = elementoClicado.id;
+  let partesDoContato: Array<string> = idDoContatoClicado.split('-'); // formatei o id de cada contato assim: ex contato-item-Maria-Silva-987654321. E agora estou retirando os '-' para pegar o nome e numero separados
+  let numeroExtraido = partesDoContato[partesDoContato.length - 1]; //captura do ultimo elemento (numero)
+  let nomeExtraido: string = partesDoContato.slice(2, partesDoContato.length - 1).join(' '); //captura do 3º elemento até o penultimo (excluindo 'contato' e 'item') e formatação com o join(). Fazendo por exemplo o id Maria-Silva se tornar Maria Silva
+  console.log(numeroExtraido);
+  console.log(nomeExtraido);
+  //Pesquisa do contato com base no nome + numero
+  let contatoEncontrado = listaDeContatos.find((contato) => contato.nome == nomeExtraido && contato.numero == numeroExtraido)
 
-    listaDeContatos[index].numero = inputAlteracaoNumero.value;
-    listaDeContatos[index].nome = inputAlteracaoNome.value;
-    listaDeContatos[index].sobrenome = inputAlteracaoSobrenome.value ?? 'N/A';
-    listaDeContatos[index].empresa = inputAlteracaoEmpresa.value ?? 'N/A';
-    listaDeContatos[index].email = inputAlteracaoEmail.value ?? 'N/A';
-    alert(`Contato editado: \n \n Nome: ${listaDeContatos[index].nome} \n Número: ${listaDeContatos[index].numero} \n Sobrenome: ${listaDeContatos[index].sobrenome} \n Empresa: ${listaDeContatos[index].empresa} \n Email: ${listaDeContatos[index].email}`);
-    fecharFormulario();
-    exibeContatos();
+  if (contatoEncontrado) { // Se contatoEncontrado existir ele é true. Coisas o if em TypeScript e JavaScript
+    abrirFormulario(contatoEncontrado!);
   }
+  else console.log("Erro: Contato não encontrado para o ID:", idDoContatoClicado);
+}
 
-  function verificaBusca(contatoAtual: Contato, termoDePesquisa: string): boolean {
-    let verificacaoPorContato: Array<string> = [
-      contatoAtual.nome.toLowerCase(),
-      (contatoAtual.sobrenome ?? '').toLowerCase(),
-      contatoAtual.numero.toLowerCase(),
-      (contatoAtual.empresa ?? '').toLowerCase(),
-      (contatoAtual.email ?? '').toLowerCase()
-    ];
-    return verificacaoPorContato.some((valor) => valor.includes(termoDePesquisa));
-  }
+function abrirFormulario(contato: Contato) {
+  formularioDeEdicao.style.display = 'block'; // ativa o formulario (torna ele visivel)
 
-  function lidarComPesquisa(): void {
-    let termoDePesquisa = inputTermoProcurado.value.toLowerCase();
-    if (termoDePesquisa === '') {
-      return exibeContatos();
-    }
-    let contatosFiltrados = listaDeContatos.filter(contato => verificaBusca(contato, termoDePesquisa));
-    exibeContatos(contatosFiltrados);
-  }
+  // inserindo o dado do contato selecionado nos campos de alteração
+  inputAlteracaoNome.value = contato.nome;
+  inputAlteracaoSobrenome.value = contato.sobrenome ?? '';
+  inputAlteracaoNumero.value = contato.numero;
+  inputAlteracaoEmpresa.value = contato.empresa ?? '';
+  inputAlteracaoEmail.value = contato.email ?? '';
 
-  function lidarCliqueContato(event: Event): void {
-    console.log("função abrir chamada");
-    let elementoClicado = event.currentTarget as HTMLLIElement; // evento disparado no caso clicar o li (elemento da lista de contatos)
-    let idDoContatoClicado = elementoClicado.id;
-    let partesDoContato: Array<string> = idDoContatoClicado.split('-'); // formatei o id de cada contato assim: ex contato-item-Maria-Silva-987654321. E agora estou retirando os '-' para pegar o nome e numero separados
-    let numeroExtraido = partesDoContato[partesDoContato.length - 1]; //captura do ultimo elemento (numero)
-    let nomeExtraido: string = partesDoContato.slice(2, partesDoContato.length - 1).join(' '); //captura do 3º elemento até o penultimo (excluindo 'contato' e 'item') e formatação com o join(). Fazendo por exemplo o id Maria-Silva se tornar Maria Silva
-    console.log(numeroExtraido);
-    console.log(nomeExtraido);
-    //Pesquisa do contato com base no nome + numero
-    let contatoEncontrado = listaDeContatos.find((contato) => contato.nome == nomeExtraido && contato.numero == numeroExtraido)
+  // definindo minha variavel global para depois repassa-la para os botões de 'Salvar Alterações' e 'Excluir'
+  contatoSendoEditado = contato;
+}
 
-    if (contatoEncontrado) { // Se contatoEncontrado existir ele é true. Coisas o if em TypeScript e JavaScript
-      abrirFormulario(contatoEncontrado!);
-    }
-    else console.log("Erro: Contato não encontrado para o ID:", idDoContatoClicado);
-  }
-
-  function abrirFormulario(contato: Contato) {
-    formularioDeEdicao.style.display = 'block'; // ativa o formulario (torna ele visivel)
-
-    // inserindo o dado do contato selecionado nos campos de alteração
-    inputAlteracaoNome.value = contato.nome;
-    inputAlteracaoSobrenome.value = contato.sobrenome ?? '';
-    inputAlteracaoNumero.value = contato.numero;
-    inputAlteracaoEmpresa.value = contato.empresa ?? '';
-    inputAlteracaoEmail.value = contato.email ?? '';
-
-    // definindo minha variavel global para depois repassa-la para os botões de 'Salvar Alterações' e 'Excluir'
-    contatoSendoEditado = contato;
-  }
-
-  function fecharFormulario(): void {
-    formularioDeEdicao.style.display = 'none';
-  }
+function fecharFormulario(): void {
+  formularioDeEdicao.style.display = 'none';
+}
