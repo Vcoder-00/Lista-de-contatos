@@ -1,7 +1,7 @@
 /* === ESTILO GERAL === */
 body {
   font-family: Arial, sans-serif;
-  background-color: #a7a78d;
+  background-color: #0966c4;
   color: #333;
   max-width: 800px;
   margin: auto;
@@ -9,19 +9,18 @@ body {
 }
 
 h2 {
-  color: #3a0000;
+  color: #133d36;
   margin-bottom: 10px;
-  
 }
 
 /* === INPUTS === */
 input[type="text"],
 input[type="email"] {
-  width:90%;
-  padding: 15px;
-  margin: 10px  20px 0;
-  border: 5px solid #753838;
-  border-radius: 15px;
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0 15px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
   box-sizing: border-box;
   transition: border 0.3s ease;
 }
@@ -34,30 +33,30 @@ input[type="email"]:focus {
 
 /* === BOTÕES === */
 button {
-  background-color: #a5a09d;
-  color: #161010;
+  background-color: #490e44;
+  color: white;
   padding: 10px 20px;
   margin: 5px 5px 10px 0;
   border: none;
-  border-radius: 25px;
+  border-radius: 5px;
   font-size: 15px;
   cursor: pointer;
   transition: background 0.3s ease;
 }
 
 button:hover {
-  background-color: #f9fcff;
+  background-color: #4b6a8a;
 }
 
 /* === BLOCO DE SEÇÕES === */
 #funcoes-auxiliares,
 #sessao-adicionar-contato,
 #formulario-de-edicao {
-  background-color: #461010;
+  background-color: #ffffff;
   padding: 20px;
   margin-bottom: 20px;
-  border-radius: 20px;
-  box-shadow: 0 2px 5px #5f1717;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* === LISTA DE CONTATOS === */
@@ -67,12 +66,10 @@ button:hover {
 }
 
 #lista-de-contatos li {
-  background-color: #0fa18285;
-  box-shadow: 0 2px 5px #09b2be;
-  color: #161010;
+  background-color: #06111b;
   padding: 12px;
   margin-bottom: 10px;
-  border-radius: 15px;
+  border-radius: 6px;
   display: flex;
   justify-content: space-between;
   align-items: center;
