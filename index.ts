@@ -92,44 +92,38 @@ function exibeContatos(lista?: Array<Contato>): void { //exibe uma lista filtrad
 
 function adicionaContatos(): void {
 
-  let contatoNumero: string = inputTelefone.value;
-  let contatoNome: string = inputNome.value;
-  let contatoSobrenome: string | undefined = inputSobrenome.value || undefined; // --> lembrando esses atributos não são obrigatórios
-  let contatoEmpresa: string | undefined = inputEmpresa.value || undefined;
-  let contatoEmail: string | undefined = inputEmail.value || undefined;
+  let contatoNumero: string = inputTelefone.value.trim(); // .trim() retira os espaços transforma, por exemplo '    barril    ' em: 'barril' importante pq o usuario pode digitar apenas espaço no nome de contato e queremos que isso seja desconsiderado.  
+  let contatoNome: string = inputNome.value.trim();
+  let contatoSobrenome: string | undefined = inputSobrenome.value.trim() || undefined; // --> lembrando esses atributos não são obrigatórios
+  let contatoEmpresa: string | undefined = inputEmpresa.value.trim() || undefined;
+  let contatoEmail: string | undefined = inputEmail.value.trim() || undefined;
 
-  if (isNaN(Number(contatoNumero))) { // verifica se o usuario digitou um nome. Se digitou, Number(contatoNumero) vai resultar em NaN o que torna esse if(true) e dispara o alert de erro pro usuario
-    alert("Número de telefone não é um número");
+  const erro: string | null = validaContato(contatoNome, contatoNumero);
+
+  if (erro !== null) {
+    alert(erro);
+    return;
   }
+
   else {
 
-  if (listaDeContatos.some((contato) => contato.nome == contatoNome && contato.numero == contatoNumero)) {
-    alert('Já existe um contato com o mesmo nome e número');
-  }    
-    else {
+    let novoContato = new Contato(contatoNumero, contatoNome, contatoSobrenome, contatoEmpresa, contatoEmail);
 
-      let contato = new Contato(contatoNumero, contatoNome, contatoSobrenome, contatoEmpresa, contatoEmail);
+    listaDeContatos.push(novoContato);
 
-      if (contatoNumero == '' || contatoNome == '') {
-        alert('Seu contato precisa ter nome e número!');
-      }
-      else {
-        listaDeContatos.push(contato);
+    exibeContatos();
 
-        exibeContatos();
+    // Limpa os campos de digitação do HTML para a próxima entrada
 
-        // Limpa os campos de digitação do HTML para a próxima entrada
+    inputTelefone.value = "";
+    inputNome.value = "";
+    inputSobrenome.value = "";
+    inputEmpresa.value = "";
+    inputEmail.value = "";
 
-        inputTelefone.value = "";
-        inputNome.value = "";
-        inputSobrenome.value = "";
-        inputEmpresa.value = "";
-        inputEmail.value = "";
-
-      }
-    }
   }
 }
+
 
 function excluirContato(): void {
   let IndexContato = listaDeContatos.findIndex((contato) => contato == contatoSendoEditado);
@@ -140,16 +134,34 @@ function excluirContato(): void {
 }
 
 function editarContato(): void {
+
   let index = listaDeContatos.findIndex((contato) => contato == contatoSendoEditado);
 
-  listaDeContatos[index].numero = inputAlteracaoNumero.value;
-  listaDeContatos[index].nome = inputAlteracaoNome.value;
-  listaDeContatos[index].sobrenome = inputAlteracaoSobrenome.value ?? 'N/A';
-  listaDeContatos[index].empresa = inputAlteracaoEmpresa.value ?? 'N/A';
-  listaDeContatos[index].email = inputAlteracaoEmail.value ?? 'N/A';
-  alert(`Contato editado: \n \n Nome: ${listaDeContatos[index].nome} \n Número: ${listaDeContatos[index].numero} \n Sobrenome: ${listaDeContatos[index].sobrenome} \n Empresa: ${listaDeContatos[index].empresa} \n Email: ${listaDeContatos[index].email}`);
-  fecharFormulario();
-  exibeContatos();
+  const novoNome = inputAlteracaoNome.value.trim();
+  const novoNumero = inputAlteracaoNumero.value.trim();
+  const novoSobrenome = inputAlteracaoSobrenome.value.trim() || undefined;
+  const novoEmpresa = inputAlteracaoEmpresa.value.trim() || undefined;
+  const novoEmail = inputAlteracaoEmail.value.trim() || undefined;
+
+  const erro: string | null = validaContato(novoNome, novoNumero, contatoSendoEditado);
+
+  if (erro) {
+    alert(erro);
+  }
+
+  else {
+
+    listaDeContatos[index].numero = novoNumero;
+    listaDeContatos[index].nome = novoNome;
+    listaDeContatos[index].sobrenome = novoSobrenome ?? 'N/A';
+    listaDeContatos[index].empresa = novoEmpresa ?? 'N/A';
+    listaDeContatos[index].email = novoEmail ?? 'N/A';
+
+    alert(`Contato editado: \n \n Nome: ${listaDeContatos[index].nome} \n Número: ${listaDeContatos[index].numero} \n Sobrenome: ${listaDeContatos[index].sobrenome} \n Empresa: ${listaDeContatos[index].empresa} \n Email: ${listaDeContatos[index].email}`);
+
+    fecharFormulario();
+    exibeContatos();
+  }
 }
 
 function verificaBusca(contatoAtual: Contato, termoDePesquisa: string): boolean {
@@ -206,4 +218,38 @@ function abrirFormulario(contato: Contato) {
 
 function fecharFormulario(): void {
   formularioDeEdicao.style.display = 'none';
+}
+
+function validaContato(nome: string, numero: string, contatoAEditar?: Contato | null): string | null { // precisei incluir uma variavel opcional para ignorar o contato que está sendo editado na hora de comparar pra ver se há duplicidade de contatos. Caso contrário a função '.some' vai disparar erro ao encontrar o mesmo contato que já está sendo editado.
+
+  let contatoNome = nome;
+  let contatoNumero = numero;
+
+  if (contatoNumero == '' || contatoNome == '') {
+    return 'nome e número precisam estar preenchidos!';
+  }
+
+  if (isNaN(Number(contatoNumero))) { // verifica se o usuario digitou um nome. Se digitou, Number(contatoNumero) vai resultar em NaN o que torna esse if(true) e dispara o alert de erro pro usuario
+    return 'número inválido';
+  }
+
+  const contatoDuplicado: boolean = listaDeContatos.some(contatoAtualNaLista => {
+    // Primeira verificação: É o contato que estamos editando?
+    if (contatoAEditar && contatoAtualNaLista === contatoAEditar) {
+      // Se for o próprio contato que estamos editando,
+      // NÃO o consideramos um duplicado.
+      return false;
+    }
+
+    // Segunda verificação: É um duplicado do novo nome/número?
+    // Só chegamos aqui se não for o contato em edição.
+    return contatoAtualNaLista.nome === nome && contatoAtualNaLista.numero === numero;
+  });
+
+  if (contatoDuplicado) { // contatoDuplicado retorna 'true' se nele houver um valor
+    return "Já existe um contato com o mesmo nome e número.";
+  }
+
+  return null; // Se tudo passar
+
 }
