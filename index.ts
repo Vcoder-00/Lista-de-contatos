@@ -219,8 +219,8 @@ function abrirFormulario(contato: Contato) {
 }
 
 function fecharFormulario(): void {
-  overlay.style.display = 'none'; // fecha o overlay e mostra o site de novo
-  formularioDeEdicao.style.display = 'none';
+  overlay.classList.remove('ativo'); // Remove a classe que exibe o overlay
+  formularioDeEdicao.classList.remove('ativo'); // Remove a classe que exibe o formulário
 }
 
 function validaContato(contatoNome: string, contatoNumero: string, contatoAEditar?: Contato | null): string | null { // precisei incluir uma variavel opcional para ignorar o contato que está sendo editado na hora de comparar pra ver se há duplicidade de contatos. Caso contrário a função '.some' vai disparar erro ao encontrar o mesmo contato que já está sendo editado.
@@ -235,21 +235,27 @@ function validaContato(contatoNome: string, contatoNumero: string, contatoAEdita
 
   const contatoDuplicado: boolean = listaDeContatos.some(contatoAtualNaLista => {
     // Primeira verificação: É o contato que estamos editando?
-    if (contatoAEditar && contatoAtualNaLista === contatoAEditar) {
+    if (contatoAtualNaLista === contatoAEditar) {
       // Se for o próprio contato que estamos editando,
       // NÃO o consideramos um duplicado.
       return false;
     }
-
     // Segunda verificação: É um duplicado do novo nome/número?
     // Só chegamos aqui se não for o contato em edição.
-    return contatoAtualNaLista.nome === contatoNome && contatoAtualNaLista.numero === contatoNumero;
+
+    // Tem o mesmo nome? retorna true: existe um erro!
+    else if (contatoAtualNaLista.nome === contatoNome) {
+      return true;
+    }
+    // Tem o mesmo numero? retorna true: existe um erro!
+    else if (contatoAtualNaLista.numero === contatoNumero) {
+      return true;
+    }
   });
 
   if (contatoDuplicado) { // contatoDuplicado retorna 'true' se nele houver um valor
-    return "Já existe um contato com o mesmo nome e número.";
+    return "Já existe um contato com o mesmo nome e/ou número.";
   }
 
   return null; // Se tudo passar
-
 }
