@@ -235,21 +235,27 @@ function validaContato(contatoNome: string, contatoNumero: string, contatoAEdita
 
   const contatoDuplicado: boolean = listaDeContatos.some(contatoAtualNaLista => {
     // Primeira verificação: É o contato que estamos editando?
-    if (contatoAEditar && contatoAtualNaLista === contatoAEditar) {
+    if (contatoAtualNaLista === contatoAEditar) {
       // Se for o próprio contato que estamos editando,
       // NÃO o consideramos um duplicado.
       return false;
     }
-
     // Segunda verificação: É um duplicado do novo nome/número?
     // Só chegamos aqui se não for o contato em edição.
-    return contatoAtualNaLista.nome === contatoNome && contatoAtualNaLista.numero === contatoNumero;
+
+    // Tem o mesmo nome? retorna true: existe um erro!
+    else if (contatoAtualNaLista.nome === contatoNome) {
+      return true;
+    }
+    // Tem o mesmo numero? retorna true: existe um erro!
+    else if (contatoAtualNaLista.numero === contatoNumero) {
+      return true;
+    }
   });
 
   if (contatoDuplicado) { // contatoDuplicado retorna 'true' se nele houver um valor
-    return "Já existe um contato com o mesmo nome e número.";
+    return "Já existe um contato com o mesmo nome e/ou número.";
   }
 
   return null; // Se tudo passar
-
 }
