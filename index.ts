@@ -50,6 +50,7 @@ btnExcluir.addEventListener('click', excluirContato);
 btnSalvarAlteracoes.addEventListener('click', editarContato);
 btnCancelarAlteracoes.addEventListener('click', fecharFormulario)
 
+const overlay = document.getElementById('overlay') as HTMLDivElement;
 let formularioDeEdicao = document.getElementById('formulario-de-edicao') as HTMLDivElement;
 //-------------------------------------------------------------------------------------------------------
 
@@ -76,7 +77,7 @@ function exibeContatos(lista?: Array<Contato>): void { //exibe uma lista filtrad
       liDeContatos.id = `contato-item-${contato.nome.replace(/\s/g, '-')}-${contato.numero}`; // esse id eu implementei depois, ele torna cada contato identificavel para ser usado em parametros de funções
       liDeContatos.addEventListener('click', lidarCliqueContato);
       liDeContatos.textContent = `Nome: ${contato.nome}, Sobrenome: ${contato.sobrenome || "N/A"}, Número: ${contato.numero},Empresa: ${contato.empresa || "N/A"}, Email: ${contato.email || "N/A"}`;
-      listaHtml.appendChild(liDeContatos); // --> arvore do DOM se anexa a esse novo elemento
+      listaHtml.appendChild(liDeContatos); // --> anexa os contatos formatado que veio de uma lista filtrada a listaHtml (lista não ordenada lá do html)
     });
   } else {
     listaDeContatos.forEach(contato => {
@@ -84,7 +85,7 @@ function exibeContatos(lista?: Array<Contato>): void { //exibe uma lista filtrad
       liDeContatos.id = `contato-item-${contato.nome.replace(/\s/g, '-')}-${contato.numero}`; // formatando o id do contato (*)
       liDeContatos.addEventListener('click', lidarCliqueContato);
       liDeContatos.textContent = `Nome: ${contato.nome},  Sobrenome: ${contato.sobrenome || "N/A"},  Número: ${contato.numero},  Empresa: ${contato.empresa || "N/A"},  Email: ${contato.email || "N/A"}`;
-      listaHtml.appendChild(liDeContatos); // --> arvore do DOM se anexa a esse novo elemento
+      listaHtml.appendChild(liDeContatos); // --> anexa os contatos formatados que vieram do array listaDeContatos a listaHtml
     });
   }
 
@@ -185,7 +186,7 @@ function lidarComPesquisa(): void {
 }
 
 function lidarCliqueContato(event: Event): void {
-  console.log("função abrir chamada");
+  console.log("função lidarCliqueContato() funcionando");
   let elementoClicado = event.currentTarget as HTMLLIElement; // evento disparado no caso clicar o li (elemento da lista de contatos)
   let idDoContatoClicado = elementoClicado.id;
   let partesDoContato: Array<string> = idDoContatoClicado.split('-'); // formatei o id de cada contato assim: ex contato-item-Maria-Silva-987654321. E agora estou retirando os '-' para pegar o nome e numero separados
@@ -203,7 +204,8 @@ function lidarCliqueContato(event: Event): void {
 }
 
 function abrirFormulario(contato: Contato) {
-  formularioDeEdicao.style.display = 'block'; // ativa o formulario (torna ele visivel)
+  overlay.classList.add('ativo'); // ativa o 'overlay' que é fundo semi-transparente
+  formularioDeEdicao.classList.add('ativo'); // ativa o formulario (torna ele visivel) por cima do overlay
 
   // inserindo o dado do contato selecionado nos campos de alteração
   inputAlteracaoNome.value = contato.nome;
@@ -217,13 +219,11 @@ function abrirFormulario(contato: Contato) {
 }
 
 function fecharFormulario(): void {
+  overlay.style.display = 'none'; // fecha o overlay e mostra o site de novo
   formularioDeEdicao.style.display = 'none';
 }
 
-function validaContato(nome: string, numero: string, contatoAEditar?: Contato | null): string | null { // precisei incluir uma variavel opcional para ignorar o contato que está sendo editado na hora de comparar pra ver se há duplicidade de contatos. Caso contrário a função '.some' vai disparar erro ao encontrar o mesmo contato que já está sendo editado.
-
-  let contatoNome = nome;
-  let contatoNumero = numero;
+function validaContato(contatoNome: string, contatoNumero: string, contatoAEditar?: Contato | null): string | null { // precisei incluir uma variavel opcional para ignorar o contato que está sendo editado na hora de comparar pra ver se há duplicidade de contatos. Caso contrário a função '.some' vai disparar erro ao encontrar o mesmo contato que já está sendo editado.
 
   if (contatoNumero == '' || contatoNome == '') {
     return 'nome e número precisam estar preenchidos!';
@@ -243,7 +243,7 @@ function validaContato(nome: string, numero: string, contatoAEditar?: Contato | 
 
     // Segunda verificação: É um duplicado do novo nome/número?
     // Só chegamos aqui se não for o contato em edição.
-    return contatoAtualNaLista.nome === nome && contatoAtualNaLista.numero === numero;
+    return contatoAtualNaLista.nome === contatoNome && contatoAtualNaLista.numero === contatoNumero;
   });
 
   if (contatoDuplicado) { // contatoDuplicado retorna 'true' se nele houver um valor
