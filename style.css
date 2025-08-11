@@ -1,16 +1,16 @@
 /* === ESTILO GERAL === */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #a7a78d;
-  color: #333;
-  max-width: 800px;
-  margin: auto;
-  padding: 16px;
+  font-family: Arial, sans-serif; /* === DEFINE A FONTE DAS LETRAS===*/
+  background-color: #a7a78d; /* === DEFINE A COR DE FUNDO===*/
+  color: #333; /* === DEFINE A COR DAS LETRAS ===*/
+  max-width: 800px; /* === DEFINE A LARGURA MÁXIMA DO ELEMENTO ===*/
+  margin: auto; /* === CENTRALIZA O ELEMENTO VERTICALMENTE ===*/
+  padding: 16px; /* === É O ESPAÇO INTERNO ENTRE O CONTEÚDO DE UM ELEMENTO E SUA BORDA ===*/
 }
 
 h2 {
   color: #5f5f5f;
-  margin-bottom: 10px;
+  margin-bottom: 10px; /* === DEFINE O ESPAÇAMENTO EXTERNO ABAIXO DO ELEMENTO ===*/
   
 }
 
@@ -19,10 +19,10 @@ input[type="text"],
 input[type="email"] {
   width:90%;
   padding: 15px;
-  margin: 10px  20px 0;
-  border: 5px solid #753838;
-  border-radius: 15px;
-  box-sizing: border-box;
+  margin: 10px  20px 0; /* === ESPAÇAMENTO EXTERNO ATÉ A MARGEM SUPERIOR, DOS LADOS E INFERIOR ===*/
+  border: 5px solid #753838; /* === LARGURA, ESTILO E COR DA BORDA DO ELEMENTO ===*/
+  border-radius: 15px; /* === ARREDONDAMENTO DA BORDA ===*/
+  box-sizing: border-box; 
   transition: border 0.3s ease;
 }
 
@@ -67,8 +67,8 @@ button:hover {
 }
 
 #lista-de-contatos li {
-  background-color: #b46e7a;
-  box-shadow: 0 2px 5px #ac002b;
+  background-color: #9e4f0ea6;
+  box-shadow: 0 2px 5px #522704;
   color: #161010;
   padding: 12px;
   margin-bottom: 10px;
