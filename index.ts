@@ -191,7 +191,7 @@ function lidarCliqueContato(event: Event): void {
   let idDoContatoClicado = elementoClicado.id;
   let partesDoContato: Array<string> = idDoContatoClicado.split('-'); // formatei o id de cada contato assim: ex contato-item-Maria-Silva-987654321. E agora estou retirando os '-' para pegar o nome e numero separados
   let numeroExtraido = partesDoContato[partesDoContato.length - 1]; //captura do ultimo elemento (numero)
-  let nomeExtraido: string = partesDoContato.slice(2, partesDoContato.length - 1).join(' '); //captura do 3º elemento até o penultimo (excluindo 'contato' e 'item') e formatação com o join(). Fazendo por exemplo o id Maria-Silva se tornar Maria Silva
+  let nomeExtraido: string = partesDoContato.slice(2, partesDoContato.length - 1).join(' '); //captura do 3º elemento até o penultimo (excluindo 'contato' e 'item') e formatação com o join(). Fazendo por exemplo o array [Maria,Silva] se tornar uma string 'Maria Silva'
   console.log(numeroExtraido);
   console.log(nomeExtraido);
   //Pesquisa do contato com base no nome + numero
