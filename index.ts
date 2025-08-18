@@ -40,12 +40,14 @@ const listaHtml = document.getElementById('lista-de-contatos') as HTMLUListEleme
 
 const btnAdicionar = document.getElementById('btn-adicionar') as HTMLButtonElement;
 const btnPesquisar = document.getElementById('btn-pesquisar') as HTMLButtonElement;
+const btnLimparExibicao = document.getElementById('btn-limpar-exibicao') as HTMLButtonElement;
 const btnExcluir = document.getElementById('btn-excluir') as HTMLButtonElement;
 const btnSalvarAlteracoes = document.getElementById('btn-salvar-alteracoes') as HTMLButtonElement;
 const btnCancelarAlteracoes = document.getElementById('btn-cancelar-alteracoes') as HTMLButtonElement;
 
 btnAdicionar.addEventListener('click', adicionaContatos);
 btnPesquisar.addEventListener('click', lidarComPesquisa);
+btnLimparExibicao.addEventListener('click', () => exibeContatos()); // addEvent passa apenas MouseEvent ou PointerEvent o que a exibe contatos não consegue pegar(ela espera uma assinatura '() => any' em outros termos 'função(evento: MouseEvent): void'), devido isso faço uma 'função anonima' que cumpre esse tipo especifico de assinatura de função. 
 btnExcluir.addEventListener('click', excluirContato);
 btnSalvarAlteracoes.addEventListener('click', editarContato);
 btnCancelarAlteracoes.addEventListener('click', fecharFormulario)
