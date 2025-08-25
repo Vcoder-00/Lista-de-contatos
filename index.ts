@@ -1,4 +1,4 @@
-// Construindo a classe Contato
+// Construindo a classe Contato-------------------------------------------------------------------------------
 
 class Contato { // antes de construir de fato o objeto é preciso definir suas variaveis
   numero: string;
@@ -20,7 +20,7 @@ class Contato { // antes de construir de fato o objeto é preciso definir suas v
 
 let listaDeContatos: Array<Contato> = [];
 
-// Coletando os elementos do html
+// Coletando os elementos do html------------------------------------------------------------------------------
 
 const inputNome = document.getElementById('contato-nome') as HTMLInputElement;
 const inputTelefone = document.getElementById('contato-numero') as HTMLInputElement;
@@ -45,22 +45,24 @@ const btnExcluir = document.getElementById('btn-excluir') as HTMLButtonElement;
 const btnSalvarAlteracoes = document.getElementById('btn-salvar-alteracoes') as HTMLButtonElement;
 const btnCancelarAlteracoes = document.getElementById('btn-cancelar-alteracoes') as HTMLButtonElement;
 
-btnAdicionar.addEventListener('click', adicionaContatos);
-btnPesquisar.addEventListener('click', lidarComPesquisa);
-btnLimparExibicao.addEventListener('click', () => exibeContatos()); // addEvent passa apenas MouseEvent ou PointerEvent o que a exibe contatos não consegue pegar(ela espera uma assinatura '() => any' em outros termos 'função(evento: MouseEvent): void'), devido isso faço uma 'função anonima' que cumpre esse tipo especifico de assinatura de função. 
-btnExcluir.addEventListener('click', excluirContato);
-btnSalvarAlteracoes.addEventListener('click', editarContato);
-btnCancelarAlteracoes.addEventListener('click', fecharFormulario)
+// Variavel global---------------------------------------------------------------------------------------------
 
-const overlay = document.getElementById('overlay') as HTMLDivElement;
-let formularioDeEdicao = document.getElementById('formulario-de-edicao') as HTMLDivElement;
-//-------------------------------------------------------------------------------------------------------
-
-// Variavel global
 // Inicia como null, essa variavel captura um elemento que foi clicado e aberto. Os botões cancelar e salvar contato não possuem um id próprio, então eles vão receber o contato que essa variavel pegar
 let contatoSendoEditado: Contato | null = null;
 
-//-------------------------------------------------------------------------------------------------------
+// Funções----------------------------------------------------------------------------------------------
+
+// Armazenando contato no navegador do usuário usando a API localStourage
+//(API do próprio navegador que permite armazenar dados de texto (strings) localmente no computador do usuário, de forma persistente. Os dados ficam salvos mesmo depois que a aba é fechada.)
+
+function carragandoContatosComLocalStourage(): void {
+  const contatosSalvos = localStorage.getItem('contatos');
+  if(contatosSalvos){
+    listaDeContatos = JSON.parse(contatosSalvos); // Converte a string de texto de volta para um array de objetos, no formato que o seu código espera.
+    exibeContatos(listaDeContatos);
+  }
+}
+
 function exibeContatos(lista?: Array<Contato>): void { //exibe uma lista filtrada, ou caso seja executada sem uma lista exibe a listaDeContatos (lista principal)
 
   listaHtml.textContent = '' // -->  para limpar a lista visualmente antes de renderizar os itens novamente.
@@ -114,6 +116,10 @@ function adicionaContatos(): void {
 
     listaDeContatos.push(novoContato);
 
+    // armazenando no navegador
+
+    localStorage.setItem('contatos', JSON.stringify(listaDeContatos)); // stringfly convertw o array no JSON
+
     exibeContatos();
 
     // Limpa os campos de digitação do HTML para a próxima entrada
@@ -131,6 +137,10 @@ function adicionaContatos(): void {
 function excluirContato(): void {
   let IndexContato = listaDeContatos.findIndex((contato) => contato == contatoSendoEditado);
   listaDeContatos.splice(IndexContato, 1);
+
+  // armazenando no navegador
+
+  localStorage.setItem('contatos', JSON.stringify(listaDeContatos));
 
   fecharFormulario();
   exibeContatos();
@@ -161,6 +171,10 @@ function editarContato(): void {
     listaDeContatos[index].email = novoEmail ?? 'N/A';
 
     alert(`Contato editado: \n \n Nome: ${listaDeContatos[index].nome} \n Número: ${listaDeContatos[index].numero} \n Sobrenome: ${listaDeContatos[index].sobrenome} \n Empresa: ${listaDeContatos[index].empresa} \n Email: ${listaDeContatos[index].email}`);
+
+    // armazenando no navegador
+
+    localStorage.setItem('contatos', JSON.stringify(listaDeContatos));
 
     fecharFormulario();
     exibeContatos();
@@ -261,3 +275,16 @@ function validaContato(contatoNome: string, contatoNumero: string, contatoAEdita
 
   return null; // Se tudo passar
 }
+// Inicio da aplicação (chamadas)------------------------------------------------------------------------------
+
+btnAdicionar.addEventListener('click', adicionaContatos);
+btnPesquisar.addEventListener('click', lidarComPesquisa);
+btnLimparExibicao.addEventListener('click', () => exibeContatos()); // addEvent passa apenas MouseEvent ou PointerEvent o que a exibe contatos não consegue pegar(ela espera uma assinatura '() => any' em outros termos função(evento: MouseEvent): *código*, devido isso faço uma 'função anonima' que cumpre esse tipo especifico de assinatura de função. 
+btnExcluir.addEventListener('click', excluirContato);
+btnSalvarAlteracoes.addEventListener('click', editarContato);
+btnCancelarAlteracoes.addEventListener('click', fecharFormulario)
+
+const overlay = document.getElementById('overlay') as HTMLDivElement;
+let formularioDeEdicao = document.getElementById('formulario-de-edicao') as HTMLDivElement;
+
+carragandoContatosComLocalStourage();
