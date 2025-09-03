@@ -16,7 +16,7 @@ class Contato { // antes de construir de fato o objeto é preciso definir suas v
   }
 }
 
-// Array recebe recebe objetos. No caso especifiquei para APENAS objetos da classe contatos
+// Array recebe que objetos. No caso especifiquei para APENAS objetos da classe contatos
 
 let listaDeContatos: Array<Contato> = [];
 
@@ -50,8 +50,23 @@ btnPesquisar.addEventListener('click', lidarComPesquisa);
 btnLimparExibicao.addEventListener('click', () => exibeContatos()); // addEvent passa apenas MouseEvent ou PointerEvent o que a exibe contatos não consegue pegar(ela espera uma assinatura '() => any' em outros termos 'função(evento: MouseEvent): void'), devido isso faço uma 'função anonima' que cumpre esse tipo especifico de assinatura de função. 
 btnExcluir.addEventListener('click', excluirContato);
 btnSalvarAlteracoes.addEventListener('click', editarContato);
-btnCancelarAlteracoes.addEventListener('click', fecharFormulario)
+btnCancelarAlteracoes.addEventListener('click', fecharFormulario);
+// Garante que o código só será executado depois que toda a página HTML for carregada.
+document.addEventListener('DOMContentLoaded', () => {
 
+  // Agora é seguro buscar os elementos, pois eles já foram carregados.
+  const btnExportar = document.getElementById('btn-exportar-json') as HTMLButtonElement;
+  const btnExcluirAgenda = document.getElementById('btn-excluir-agenda') as HTMLButtonElement;
+
+  // Verifica se os elementos foram encontrados antes de adicionar o event listener
+  if (btnExportar) {
+    btnExportar.addEventListener('click', exportarAgendaJSON);
+  }
+
+  if (btnExcluirAgenda) {
+    btnExcluirAgenda.addEventListener('click', excluirAgenda);
+  }
+});
 const overlay = document.getElementById('overlay') as HTMLDivElement;
 let formularioDeEdicao = document.getElementById('formulario-de-edicao') as HTMLDivElement;
 //-------------------------------------------------------------------------------------------------------
@@ -260,4 +275,44 @@ function validaContato(contatoNome: string, contatoNumero: string, contatoAEdita
   }
 
   return null; // Se tudo passar
+}
+
+function exportarAgendaJSON(): void {
+  const AgendaJSON: string = JSON.stringify(listaDeContatos, null, 2);
+
+  // cria o blob com a string JSON
+  const blob = new Blob([AgendaJSON], { type: 'aplication/json' });
+
+  // cria uma URL temporária para o Blob
+  const url: string = URL.createObjectURL(blob);
+
+  // cria um link de download e simula o clique
+  // (O navegador só sabe como baixar arquivos através de links (<a>).)
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'contatos.json';
+  document.body.appendChild(a);
+  a.click();
+
+  // limpa a URL temporária
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+}
+
+function excluirAgenda(): void {
+  // pede confirmação ao usuário
+  const confirmacao: boolean = confirm('Você tem certeza que deseja apagar todos os contatos?');
+
+  if (confirmacao) {
+    // Remove a chave 'contatos' do localStorage
+    localStorage.removeItem('contatos');
+
+    // Zera o array local de contatos
+    listaDeContatos = [];
+
+    // Atualiza a interface
+    exibeContatos(listaDeContatos);
+    alert('Agenda de contatos limpa com sucesso!');
+  }
 }
