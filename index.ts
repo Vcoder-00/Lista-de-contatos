@@ -16,7 +16,7 @@ class Contato { // antes de construir de fato o objeto é preciso definir suas v
   }
 }
 
-// Array recebe recebe objetos. No caso especifiquei para APENAS objetos da classe contatos
+// Array recebe que objetos. No caso especifiquei para APENAS objetos da classe contatos
 
 let listaDeContatos: Array<Contato> = [];
 
@@ -36,6 +36,9 @@ const inputAlteracaoNumero = document.getElementById('alteracoes-numero') as HTM
 const inputAlteracaoEmpresa = document.getElementById('alteracoes-empresa') as HTMLInputElement
 const inputAlteracaoEmail = document.getElementById('alteracoes-email') as HTMLInputElement
 
+const overlay = document.getElementById('overlay') as HTMLDivElement;
+let formularioDeEdicao = document.getElementById('formulario-de-edicao') as HTMLDivElement;
+
 const listaHtml = document.getElementById('lista-de-contatos') as HTMLUListElement; // Onde os contatos serão exibidos
 
 const btnAdicionar = document.getElementById('btn-adicionar') as HTMLButtonElement;
@@ -45,7 +48,10 @@ const btnExcluir = document.getElementById('btn-excluir') as HTMLButtonElement;
 const btnSalvarAlteracoes = document.getElementById('btn-salvar-alteracoes') as HTMLButtonElement;
 const btnCancelarAlteracoes = document.getElementById('btn-cancelar-alteracoes') as HTMLButtonElement;
 
-// Variavel global---------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------------
+
+// Variavel global
 
 // Inicia como null, essa variavel captura um elemento que foi clicado e aberto. Os botões cancelar e salvar contato não possuem um id próprio, então eles vão receber o contato que essa variavel pegar
 let contatoSendoEditado: Contato | null = null;
@@ -55,9 +61,9 @@ let contatoSendoEditado: Contato | null = null;
 // Armazenando contato no navegador do usuário usando a API localStourage
 //(API do próprio navegador que permite armazenar dados de texto (strings) localmente no computador do usuário, de forma persistente. Os dados ficam salvos mesmo depois que a aba é fechada.)
 
-function carragandoContatosComLocalStourage(): void {
+function carregandoContatosComLocalStourage(): void {
   const contatosSalvos = localStorage.getItem('contatos');
-  if(contatosSalvos){
+  if (contatosSalvos) {
     listaDeContatos = JSON.parse(contatosSalvos); // Converte a string de texto de volta para um array de objetos, no formato que o seu código espera.
     exibeContatos(listaDeContatos);
   }
@@ -275,6 +281,47 @@ function validaContato(contatoNome: string, contatoNumero: string, contatoAEdita
 
   return null; // Se tudo passar
 }
+
+function excluirAgenda(): void {
+  // pede confirmação ao usuário
+  const confirmacao: boolean = confirm('Você tem certeza que deseja apagar todos os contatos?');
+
+  if (confirmacao) {
+    // Remove a chave 'contatos' do localStorage
+    localStorage.removeItem('contatos');
+
+    // Zera o array local de contatos
+    listaDeContatos = [];
+
+    // Atualiza a interface
+    exibeContatos(listaDeContatos);
+    alert('Agenda de contatos limpa com sucesso!');
+  }
+}
+
+function exportarAgendaJSON(): void {
+  const AgendaJSON: string = JSON.stringify(listaDeContatos, null, 2);
+
+  // cria o blob com a string JSON
+  const blob = new Blob([AgendaJSON], { type: 'aplication/json' });
+
+  // cria uma URL temporária para o Blob
+  const url: string = URL.createObjectURL(blob);
+
+  // cria um link de download e simula o clique
+  // (O navegador só sabe como baixar arquivos através de links (<a>).)
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'contatos.json';
+  document.body.appendChild(a);
+  a.click();
+
+  // limpa a URL temporária
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+}
+
 // Inicio da aplicação (chamadas)------------------------------------------------------------------------------
 
 btnAdicionar.addEventListener('click', adicionaContatos);
@@ -282,9 +329,25 @@ btnPesquisar.addEventListener('click', lidarComPesquisa);
 btnLimparExibicao.addEventListener('click', () => exibeContatos()); // addEvent passa apenas MouseEvent ou PointerEvent o que a exibe contatos não consegue pegar(ela espera uma assinatura '() => any' em outros termos função(evento: MouseEvent): *código*, devido isso faço uma 'função anonima' que cumpre esse tipo especifico de assinatura de função. 
 btnExcluir.addEventListener('click', excluirContato);
 btnSalvarAlteracoes.addEventListener('click', editarContato);
-btnCancelarAlteracoes.addEventListener('click', fecharFormulario)
+btnCancelarAlteracoes.addEventListener('click', fecharFormulario);
 
-const overlay = document.getElementById('overlay') as HTMLDivElement;
-let formularioDeEdicao = document.getElementById('formulario-de-edicao') as HTMLDivElement;
+// Garante que o código só será executado depois que toda a página HTML for carregada.
+document.addEventListener('DOMContentLoaded', () => {
 
-carragandoContatosComLocalStourage();
+  // Agora é seguro buscar os elementos, pois eles já foram carregados.
+  const btnExportar = document.getElementById('btn-exportar-json') as HTMLButtonElement;
+  const btnExcluirAgenda = document.getElementById('btn-excluir-agenda') as HTMLButtonElement;
+
+  // Verifica se os elementos foram encontrados antes de adicionar o event listener
+  if (btnExportar) {
+    btnExportar.addEventListener('click', exportarAgendaJSON);
+  }
+
+  if (btnExcluirAgenda) {
+    btnExcluirAgenda.addEventListener('click', excluirAgenda);
+  }
+});
+
+
+
+
